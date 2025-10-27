@@ -1,4 +1,4 @@
-%global tag     0.1.3
+%global tag     0.1.4
 %global scroll_base 1.11.7
 
 Name:           scrollfx
