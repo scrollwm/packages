@@ -1,0 +1,97 @@
+name: Update Package Versions
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+
+jobs:
+  update-versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    container:
+      image: 'registry.fedoraproject.org/fedora-minimal:latest'
+
+    steps:
+      - name: Prepare environment
+        run: |
+          microdnf -y install --nodocs --setopt=install_weak_deps=0 \
+            git-core rpm-build curl jq rpmdevtools findutils sed
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # Check for ScrollFX updates
+      - name: Check ScrollFX updates
+        run: |
+          if [ -f "scrollfx/update.sh" ]; then
+            chmod +x scrollfx/update.sh
+            cd scrollfx
+            ./update.sh || true
+            cd ..
+          fi
+
+      # Check for Scroll updates
+      - name: Check Scroll updates
+        run: |
+          if [ -f "scroll/update.sh" ]; then
+            chmod +x scroll/update.sh
+            cd scroll
+            ./update.sh || true
+            cd ..
+          fi
+
+      # Check for SceneFX updates
+      - name: Check SceneFX updates
+        run: |
+          echo "Checking for SceneFX updates..."
+          
+          # Get latest release tag
+          LATEST_TAG=$(curl -s https://api.github.com/repos/wlrfx/scenefx/releases/latest | jq -r .tag_name)
+          
+          if [ "$LATEST_TAG" != "null" ] && [ -n "$LATEST_TAG" ]; then
+            # Extract version (e.g., "0.4.2" from tag)
+            LATEST_VERSION="${LATEST_TAG}"
+            
+            # Get current version from spec
+            CURRENT_VERSION=$(grep "^%global tag_full" COPR/scenefx/scenefx.rpkg.spec | awk '{print $3}')
+            
+            echo "Current: $CURRENT_VERSION"
+            echo "Latest: $LATEST_VERSION"
+            
+            if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
+              echo "Update available for SceneFX!"
+              
+              # Update spec file
+              sed -i "s/^%global tag_full.*/%global tag_full $LATEST_VERSION/" COPR/scenefx/scenefx.rpkg.spec
+              sed -i "s/^Version:.*/Version:        $LATEST_VERSION/" COPR/scenefx/scenefx.rpkg.spec
+              
+              # Extract major.minor for tag variable (e.g., "0.4")
+              TAG_VERSION=$(echo "$LATEST_VERSION" | cut -d. -f1-2)
+              sed -i "s/^%global tag.*/%global tag $TAG_VERSION/" COPR/scenefx/scenefx.rpkg.spec
+              
+              # Try to commit
+              git add COPR/scenefx/scenefx.rpkg.spec
+              git diff --staged --quiet || git commit -m "scenefx: Update to $LATEST_VERSION [build-wayland]" || true
+            fi
+          fi
+
+      # Push changes if any
+      - name: Push changes
+        run: |
+          if ! git diff --quiet HEAD origin/main; then
+            echo "Pushing updates..."
+            git push origin main
+          else
+            echo "No updates to push"
+          fi

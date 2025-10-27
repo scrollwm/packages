@@ -1,0 +1,90 @@
+name: Build ScrollWM Packages
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'COPR/scenefx*/**'
+      - 'scrollfx/**'
+      - 'scroll/**'
+      - '.copr/**'
+      - '.github/workflows/build.yml'
+    branches: [ main ]
+
+jobs:
+  build-packages:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.head_commit.message, '[build-all]') ||
+      contains(github.event.head_commit.message, '[build-wayland]')
+    runs-on: ubuntu-latest
+    container:
+      image: 'registry.fedoraproject.org/fedora-minimal:latest'
+
+    steps:
+      - name: Prepare build environment
+        run: |
+          microdnf -y install --nodocs --setopt=install_weak_deps=0 \
+            copr-cli git tar gzip jq
+
+      - name: Configure COPR
+        env:
+          COPR_CONF: ${{ secrets.COPR_CONFIG }}
+        run: |
+          mkdir -p ~/.config
+          echo "$COPR_CONF" > ~/.config/copr
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Git
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
+      # Build SceneFX first (dependency for scrollfx)
+      - name: Build SceneFX
+        run: |
+          echo "Building scenefx..."
+          scenefx_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scenefx 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          echo "SCENEFX_BUILD_ID=$scenefx_build_id" >> $GITHUB_ENV
+          echo "SceneFX build ID: $scenefx_build_id"
+
+      # Build ScrollFX after SceneFX completes
+      - name: Build ScrollFX
+        run: |
+          echo "Building scrollfx..."
+          if [ "$SCENEFX_BUILD_ID" != "0" ]; then
+            # Wait for SceneFX 0.4 to complete before building scrollfx
+            scrollfx_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scrollfx --after-build-id "$SCENEFX_BUILD_ID" 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          else
+            scrollfx_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scrollfx 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          fi
+          echo "SCROLLFX_BUILD_ID=$scrollfx_build_id" >> $GITHUB_ENV
+          echo "ScrollFX build ID: $scrollfx_build_id"
+
+      # Build Scroll (backup/reference)
+      - name: Build Scroll
+        run: |
+          echo "Building scroll..."
+          scroll_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scroll 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          echo "SCROLL_BUILD_ID=$scroll_build_id" >> $GITHUB_ENV
+          echo "Scroll build ID: $scroll_build_id"
+
+      # Check build status
+      - name: Check build status
+        if: always()
+        run: |
+          echo "Waiting for builds to register..."
+          sleep 60
+          
+          echo "=== Build Status Summary ==="
+          copr-cli list-builds scrollwm/packages --output-format text-row | head -20
+          
+          echo ""
+          echo "=== Build IDs ==="
+          echo "SceneFX: $SCENEFX_BUILD_ID"
+          echo "ScrollFX: $SCROLLFX_BUILD_ID"
+          echo "Scroll: $SCROLL_BUILD_ID"
+          
+          echo ""
+          echo "Monitor builds at: https://copr.fedorainfracloud.org/coprs/scrollwm/packages/builds/"

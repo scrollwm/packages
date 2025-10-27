@@ -1,7 +1,7 @@
-%global tag     1.11.3
+%global tag     1.11.7
 
 Name:           scroll
-Version:        1.11.3
+Version:        1.11.7
 Release:        1%{?dist}
 Summary:        i3-compatible Wayland compositor with a scrolling layout
 License:        MIT
@@ -12,12 +12,6 @@ Source0:        %{url}/archive/refs/tags/%{tag}.tar.gz
 # Minimal configuration file for headless or buildroot use
 Source100:      config.minimal
 Source101:      scroll-portals.conf
-
-# Upstream patches
-
-# Fedora patches
-
-# Conditional patches
 
 BuildRequires:  gcc-c++
 BuildRequires:  meson >= 0.60.0
@@ -164,26 +158,5 @@ install -d -m755 -pv %{buildroot}%{_sysconfdir}/%{name}/config.d
 %config(noreplace) %{_sysconfdir}/%{name}/config.minimal
 
 %changelog
-* Sat Jul 19 2025 Thomas Mecattaf <thomas@mecattaf.dev> - 1.11.3-1
-- Update to 1.11.3
-* Thu Jul 10 2025 Thomas Mecattaf <thomas@mecattaf.dev> - 1.11.2-1
-- Update to 1.11.2
-* Thu Jul 10 2025 Thomas Mecattaf <thomas@mecattaf.dev> - null-1
-- Update to null
-* Wed Jul 09 2025 Thomas Mecattaf <thomas@mecattaf.dev> - 1.11.1-1
-- Update to 1.11.1
-* Tue Jul 08 2025 Thomas Mecattaf <thomas@mecattaf.dev> - null-1
-- Update to null
-* Thu Jul 03 2025 Thomas Mecattaf <thomas@mecattaf.dev> - 1.11.1-1
-- Update to 1.11.1
-* Wed Jun 11 2025 Thomas Mecattaf <thomas@mecattaf.dev> - 1.11-1
-- Update to 1.11
-* Wed Jun 11 2025 Thomas Mecattaf <thomas@mecattaf.dev> - null-1
-- Update to null
-* Sat May 10 2025 Thomas Mecattaf <thomas@mecattaf.dev> - 1.11-1
-- Update to stable release 1.11
-- First stable release of scroll, forked from sway 1.11
-- Split configuration into upstream and minimal packages
-
-* Sat May 10 2025 Thomas Mecattaf <thomas@mecattaf.dev> - 0.1.0~20250510gited43b3-0.1
-- Initial package of scroll using git snapshot
+* Mon Oct 27 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.11.7-1
+- Backup scroll package in scrollwm repository

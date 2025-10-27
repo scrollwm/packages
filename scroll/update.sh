@@ -8,7 +8,7 @@ CURRENT_VERSION=$(rpmspec -q --qf "%{version}\n" scroll.spec 2>/dev/null | head 
 echo "Current version: $CURRENT_VERSION"
 echo "Latest release: $LATEST_RELEASE"
 
-if [ "$LATEST_RELEASE" != "$CURRENT_VERSION" ]; then
+if [ "$LATEST_RELEASE" != "$CURRENT_VERSION" ] && [ "$LATEST_RELEASE" != "null" ]; then
     echo "Updating scroll to $LATEST_RELEASE"
     
     # Update Version and tag in spec file
@@ -17,7 +17,7 @@ if [ "$LATEST_RELEASE" != "$CURRENT_VERSION" ]; then
     
     # Update changelog
     DATE=$(date +"%a %b %d %Y")
-    CHANGELOG_ENTRY="* $DATE Thomas Mecattaf <thomas@mecattaf.dev> - $LATEST_RELEASE-1\n- Update to $LATEST_RELEASE"
+    CHANGELOG_ENTRY="* $DATE ScrollWM Team <maintainers@scrollwm.org> - $LATEST_RELEASE-1\n- Update to $LATEST_RELEASE"
     
     # Insert the new changelog entry after %changelog
     sed -i "/%changelog/a $CHANGELOG_ENTRY" scroll.spec
@@ -28,10 +28,10 @@ if [ "$LATEST_RELEASE" != "$CURRENT_VERSION" ]; then
     # Commit changes if in git
     if [ -d ../.git ]; then
         git add scroll.spec
-        git commit -m "scroll: Update to $LATEST_RELEASE [build-gcc]" || true
+        git commit -m "scroll: Update to $LATEST_RELEASE [build-wayland]" || true
     fi
     
     echo "Updated scroll to $LATEST_RELEASE"
 else
-    echo "scroll is already at the latest version"
+    echo "scroll is already at the latest version or no release found"
 fi
