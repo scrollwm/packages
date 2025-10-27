@@ -1,4 +1,4 @@
-%global tag     0.1.0
+%global tag     0.1.2
 %global scroll_base 1.11.7
 
 Name:           scrollfx
@@ -156,6 +156,8 @@ install -d -m755 -pv %{buildroot}%{_sysconfdir}/%{name}/config.d
 %config(noreplace) %{_sysconfdir}/%{name}/config.minimal
 
 %changelog
+* Mon Oct 27 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.1.2-1
+- Updated meson.build
 * Mon Oct 27 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.1.0-1
 - Initial release of ScrollFX
 - Combines Scroll %{scroll_base} with SceneFX rendering
