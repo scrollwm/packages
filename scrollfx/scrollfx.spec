@@ -2,7 +2,7 @@
 %global scroll_base 1.11.7
 
 Name:           scrollfx
-Version:        0.1.5
+Version:        0.1.6
 Release:        1%{?dist}
 Summary:        Scroll window manager with SceneFX eye candy rendering
 License:        MIT
