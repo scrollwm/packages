@@ -34,8 +34,10 @@ BuildRequires:  pkgconfig(wayland-client)
 BuildRequires:  pkgconfig(wayland-cursor)
 BuildRequires:  pkgconfig(wayland-server) >= 1.23.1
 BuildRequires:  pkgconfig(wayland-protocols) >= 1.41
-BuildRequires:  pkgconfig(scenefx-0.4)
-BuildRequires:  pkgconfig(wlroots-0.19)
+# Require scenefx-0.4 and wlroots-0.19.1
+BuildRequires:  pkgconfig(scenefx-0.4) >= 0.4.1
+BuildRequires:  pkgconfig(wlroots-0.19) >= 0.19.1
+BuildRequires:  pkgconfig(wlroots-0.19) < 0.19.2
 BuildRequires:  pkgconfig(xcb)
 BuildRequires:  pkgconfig(xcb-icccm)
 BuildRequires:  pkgconfig(xkbcommon) >= 1.5.0
