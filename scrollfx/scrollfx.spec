@@ -1,8 +1,8 @@
-%global tag     0.1.6
+%global tag     0.1.7
 %global scroll_base 1.11.7
 
 Name:           scrollfx
-Version:        0.1.6
+Version:        0.1.7
 Release:        1%{?dist}
 Summary:        Scroll window manager with SceneFX eye candy rendering
 License:        MIT
@@ -158,8 +158,10 @@ install -d -m755 -pv %{buildroot}%{_sysconfdir}/%{name}/config.d
 %config(noreplace) %{_sysconfdir}/%{name}/config.minimal
 
 %changelog
+* Tue Oct 28 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.1.7-1
+- Update to 0.1.7
 * Tue Oct 28 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.1.6-1
-- Update to 0.1.5
+- Update to 0.1.6
 * Tue Oct 28 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.1.5-1
 - Update to 0.1.5
 * Mon Oct 27 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.1.2-1
