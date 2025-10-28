@@ -34,7 +34,8 @@ BuildRequires:  pkgconfig(wayland-client)
 BuildRequires:  pkgconfig(wayland-cursor)
 BuildRequires:  pkgconfig(wayland-server) >= 1.23.1
 BuildRequires:  pkgconfig(wayland-protocols) >= 1.41
-BuildRequires:  pkgconfig(wlroots-0.19)
+# Require wlroots-0.19.2 (for scroll 1.11.8+)
+BuildRequires:  pkgconfig(wlroots-0.19) >= 0.19.2
 BuildRequires:  pkgconfig(xcb)
 BuildRequires:  pkgconfig(xcb-icccm)
 BuildRequires:  pkgconfig(xkbcommon) >= 1.5.0

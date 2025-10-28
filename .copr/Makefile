@@ -12,7 +12,7 @@ gccprep: prepare
 
 prebuild:
 	@buildtype="unknown"; \
-	if grep -q "Name:.*scenefx\|Name:.*scrollfx\|Name:.*scroll" "$(SPECFILE)"; then \
+	if grep -q "Name:.*scenefx\|Name:.*scrollfx\|Name:.*scroll\|Name:.*wayland\|Name:.*wlroots" "$(SPECFILE)"; then \
 		buildtype="gcc"; \
 	fi; \
 	case $$buildtype in \
