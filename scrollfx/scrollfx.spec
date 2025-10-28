@@ -158,6 +158,8 @@ install -d -m755 -pv %{buildroot}%{_sysconfdir}/%{name}/config.d
 %config(noreplace) %{_sysconfdir}/%{name}/config.minimal
 
 %changelog
+* Tue Oct 28 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.1.6-1
+- Update to 0.1.5
 * Tue Oct 28 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.1.5-1
 - Update to 0.1.5
 * Mon Oct 27 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.1.2-1
