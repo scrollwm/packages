@@ -1,5 +1,5 @@
 Name:           wayland
-Version:        1.23.1
+Version:        1.24.0
 Release:        1%{?dist}
 Summary:        Wayland Compositor Infrastructure
 
@@ -111,6 +111,8 @@ Wayland server library
 %{_libdir}/libwayland-server.so.0*
 
 %changelog
+* Tue Oct 28 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.24.0-1
+- Update to 1.24.0
 * Mon Oct 28 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.23.1-1
 - Initial package for ScrollWM
 - Required dependency for wlroots 0.19.x
