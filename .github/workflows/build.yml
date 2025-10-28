@@ -5,8 +5,10 @@ on:
   push:
     paths:
       - 'COPR/scenefx*/**'
+      - 'COPR/wlroots*/**'
       - 'scrollfx/**'
       - 'scroll/**'
+      - 'wayland/**'
       - '.copr/**'
       - '.github/workflows/build.yml'
     branches: [ main ]
@@ -41,20 +43,54 @@ jobs:
         run: |
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
 
-      # Build SceneFX first (dependency for scrollfx)
+      # Build Wayland first (dependency for all wlroots)
+      - name: Build Wayland
+        run: |
+          echo "Building wayland..."
+          wayland_build_id=$(copr-cli build-package scrollwm/packages --nowait --name wayland 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          echo "WAYLAND_BUILD_ID=$wayland_build_id" >> $GITHUB_ENV
+          echo "Wayland build ID: $wayland_build_id"
+
+      # Build both wlroots versions in parallel after Wayland
+      - name: Build wlroots-0.19.1 (for scenefx/scrollfx)
+        run: |
+          echo "Building wlroots-0.19.1..."
+          if [ "$WAYLAND_BUILD_ID" != "0" ]; then
+            wlroots_191_build_id=$(copr-cli build-package scrollwm/packages --nowait --name wlroots-0.19.1 --after-build-id "$WAYLAND_BUILD_ID" 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          else
+            wlroots_191_build_id=$(copr-cli build-package scrollwm/packages --nowait --name wlroots-0.19.1 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          fi
+          echo "WLROOTS_191_BUILD_ID=$wlroots_191_build_id" >> $GITHUB_ENV
+          echo "wlroots-0.19.1 build ID: $wlroots_191_build_id"
+
+      - name: Build wlroots-0.19.2 (for scroll)
+        run: |
+          echo "Building wlroots-0.19.2..."
+          if [ "$WAYLAND_BUILD_ID" != "0" ]; then
+            wlroots_192_build_id=$(copr-cli build-package scrollwm/packages --nowait --name wlroots-0.19.2 --after-build-id "$WAYLAND_BUILD_ID" 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          else
+            wlroots_192_build_id=$(copr-cli build-package scrollwm/packages --nowait --name wlroots-0.19.2 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          fi
+          echo "WLROOTS_192_BUILD_ID=$wlroots_192_build_id" >> $GITHUB_ENV
+          echo "wlroots-0.19.2 build ID: $wlroots_192_build_id"
+
+      # Build SceneFX after wlroots-0.19.1
       - name: Build SceneFX
         run: |
           echo "Building scenefx..."
-          scenefx_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scenefx 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          if [ "$WLROOTS_191_BUILD_ID" != "0" ]; then
+            scenefx_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scenefx --after-build-id "$WLROOTS_191_BUILD_ID" 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          else
+            scenefx_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scenefx 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          fi
           echo "SCENEFX_BUILD_ID=$scenefx_build_id" >> $GITHUB_ENV
           echo "SceneFX build ID: $scenefx_build_id"
 
-      # Build ScrollFX after SceneFX completes
+      # Build ScrollFX after SceneFX
       - name: Build ScrollFX
         run: |
           echo "Building scrollfx..."
           if [ "$SCENEFX_BUILD_ID" != "0" ]; then
-            # Wait for SceneFX 0.4 to complete before building scrollfx
             scrollfx_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scrollfx --after-build-id "$SCENEFX_BUILD_ID" 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
           else
             scrollfx_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scrollfx 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
@@ -62,11 +98,15 @@ jobs:
           echo "SCROLLFX_BUILD_ID=$scrollfx_build_id" >> $GITHUB_ENV
           echo "ScrollFX build ID: $scrollfx_build_id"
 
-      # Build Scroll (backup/reference)
+      # Build Scroll after wlroots-0.19.2
       - name: Build Scroll
         run: |
           echo "Building scroll..."
-          scroll_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scroll 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          if [ "$WLROOTS_192_BUILD_ID" != "0" ]; then
+            scroll_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scroll --after-build-id "$WLROOTS_192_BUILD_ID" 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          else
+            scroll_build_id=$(copr-cli build-package scrollwm/packages --nowait --name scroll 2>/dev/null | grep -o 'builds: [0-9]*' | cut -d' ' -f2 || echo "0")
+          fi
           echo "SCROLL_BUILD_ID=$scroll_build_id" >> $GITHUB_ENV
           echo "Scroll build ID: $scroll_build_id"
 
@@ -76,15 +116,18 @@ jobs:
         run: |
           echo "Waiting for builds to register..."
           sleep 60
-          
+
           echo "=== Build Status Summary ==="
-          copr-cli list-builds scrollwm/packages --output-format text-row | head -20
-          
+          copr-cli list-builds scrollwm/packages --output-format text-row | head -30
+
           echo ""
           echo "=== Build IDs ==="
+          echo "Wayland: $WAYLAND_BUILD_ID"
+          echo "wlroots-0.19.1: $WLROOTS_191_BUILD_ID"
+          echo "wlroots-0.19.2: $WLROOTS_192_BUILD_ID"
           echo "SceneFX: $SCENEFX_BUILD_ID"
           echo "ScrollFX: $SCROLLFX_BUILD_ID"
           echo "Scroll: $SCROLL_BUILD_ID"
-          
+
           echo ""
           echo "Monitor builds at: https://copr.fedorainfracloud.org/coprs/scrollwm/packages/builds/"
