@@ -1,3 +1,4 @@
+
 %global tag     1.12
 
 Name:           scroll
@@ -12,6 +13,9 @@ Source0:        %{url}/archive/refs/tags/%{tag}.tar.gz
 Source100:      config.minimal
 Source101:      scroll-portals.conf
 Source102:      50-systemd-user.conf
+
+# Patch to remove git version format (like Arch PKGBUILD)
+Patch0:         remove_git_version_format.patch
 
 BuildRequires:  gcc-c++
 BuildRequires:  meson >= 1.3
@@ -148,11 +152,7 @@ Suitable for headless or buildroot use.
 
 
 %prep
-%autosetup -n %{name}-%{tag}
-
-# Patch meson.build to not use git version format
-sed -i 's/git = find_program/# git = find_program/g' meson.build
-sed -i 's/if git\.found/if false/g' meson.build
+%autosetup -n %{name}-%{tag} -p1
 
 
 %build
