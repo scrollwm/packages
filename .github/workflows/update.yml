@@ -41,18 +41,10 @@ jobs:
             cd ..
           fi
 
-      # NOTE: wlroots-0.19.1 and wlroots-0.19.2 are PINNED and do not auto-update
-      # When a new wlroots version is needed, manually create a new COPR/wlroots-X.Y.Z/ directory
-
-      # Check for ScrollFX updates
-      - name: Check ScrollFX updates
-        run: |
-          if [ -f "scrollfx/update.sh" ]; then
-            chmod +x scrollfx/update.sh
-            cd scrollfx
-            ./update.sh || true
-            cd ..
-          fi
+      # NOTE: wlroots-0.20.0 is PINNED and does not auto-update
+      # Scroll 1.12+ includes wlroots in its source tree, so external wlroots
+      # package is only for system integration. When a new wlroots version
+      # is needed, manually create a new COPR/wlroots-X.Y.Z/ directory
 
       # Check for Scroll updates
       - name: Check Scroll updates
@@ -64,40 +56,8 @@ jobs:
             cd ..
           fi
 
-      # Check for SceneFX updates
-      - name: Check SceneFX updates
-        run: |
-          echo "Checking for SceneFX updates..."
-
-          # Get latest release tag
-          LATEST_TAG=$(curl -s https://api.github.com/repos/wlrfx/scenefx/releases/latest | jq -r .tag_name)
-
-          if [ "$LATEST_TAG" != "null" ] && [ -n "$LATEST_TAG" ]; then
-            # Extract version (e.g., "0.4.2" from tag)
-            LATEST_VERSION="${LATEST_TAG}"
-
-            # Get current version from spec
-            CURRENT_VERSION=$(grep "^%global tag_full" COPR/scenefx/scenefx.rpkg.spec | awk '{print $3}')
-
-            echo "Current: $CURRENT_VERSION"
-            echo "Latest: $LATEST_VERSION"
-
-            if [ "$LATEST_VERSION" != "$CURRENT_VERSION" ]; then
-              echo "Update available for SceneFX!"
-
-              # Update spec file
-              sed -i "s/^%global tag_full.*/%global tag_full $LATEST_VERSION/" COPR/scenefx/scenefx.rpkg.spec
-              sed -i "s/^Version:.*/Version:        $LATEST_VERSION/" COPR/scenefx/scenefx.rpkg.spec
-
-              # Extract major.minor for tag variable (e.g., "0.4")
-              TAG_VERSION=$(echo "$LATEST_VERSION" | cut -d. -f1-2)
-              sed -i "s/^%global tag.*/%global tag $TAG_VERSION/" COPR/scenefx/scenefx.rpkg.spec
-
-              # Try to commit
-              git add COPR/scenefx/scenefx.rpkg.spec
-              git diff --staged --quiet || git commit -m "scenefx: Update to $LATEST_VERSION [build-wayland]" || true
-            fi
-          fi
+      # NOTE: ScrollFX is deprecated as of this update and will not be maintained
+      # NOTE: SceneFX is no longer needed (was only for scrollfx)
 
       # Push changes if any
       - name: Push changes

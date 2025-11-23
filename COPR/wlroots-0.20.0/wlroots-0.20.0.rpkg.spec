@@ -1,17 +1,18 @@
+
 # vim: syntax=spec
 
 # PINNED VERSION - DO NOT AUTO-UPDATE
-# This package is pinned to wlroots 0.19.2 for scroll 1.11.8+ compatibility
+# This package is pinned to wlroots 0.20.0 for scroll 1.12+ compatibility
 
-%global abi_ver 0.19
-%global pinned_version 0.19.2
+%global abi_ver 0.20
+%global pinned_version 0.20.0
 # libliftoff does not bump soname on API changes
 %global liftoff_ver 0.5.0
 
-Name:           wlroots-0.19.2
-Version:        0.19.2
+Name:           wlroots-0.20.0
+Version:        0.20.0
 Release:        1%{?dist}
-Summary:        A modular Wayland compositor library (pinned to 0.19.2)
+Summary:        A modular Wayland compositor library (pinned to 0.20.0)
 
 # Source files/overall project licensed as MIT, but
 # - HPND-sell-variant
@@ -30,7 +31,7 @@ Source0:        %{url}/-/releases/%{pinned_version}/downloads/wlroots-%{pinned_v
 
 BuildRequires:  gcc
 BuildRequires:  glslang
-BuildRequires:  meson >= 0.59.0
+BuildRequires:  meson >= 0.60.0
 
 BuildRequires:  (pkgconfig(libdisplay-info) >= 0.1.1 with pkgconfig(libdisplay-info) < 0.3)
 BuildRequires:  (pkgconfig(libliftoff) >= %{liftoff_ver} with pkgconfig(libliftoff) < 0.6)
@@ -43,7 +44,7 @@ BuildRequires:  pkgconfig(libdrm) >= 2.4.122
 BuildRequires:  pkgconfig(libinput) >= 1.21.0
 BuildRequires:  pkgconfig(libseat)
 BuildRequires:  pkgconfig(libudev)
-BuildRequires:  pkgconfig(pixman-1) >= 0.42.0
+BuildRequires:  pkgconfig(pixman-1) >= 0.43.0
 BuildRequires:  pkgconfig(vulkan) >= 1.2.182
 BuildRequires:  pkgconfig(wayland-client)
 BuildRequires:  pkgconfig(wayland-protocols) >= 1.41
@@ -70,10 +71,15 @@ Requires:       libliftoff%{?_isa} >= %{liftoff_ver}
 
 # Conflict with other wlroots versions
 Conflicts:      wlroots-0.19.1
+Conflicts:      wlroots-0.19.2
 
 %description
-Pinned version of wlroots 0.19.2 for scroll 1.11.8+ compatibility.
-This package provides a stable wlroots 0.19.2 that will not auto-update.
+Pinned version of wlroots 0.20.0 for scroll 1.12+ compatibility.
+This package provides a stable wlroots 0.20.0 that will not auto-update.
+
+Scroll 1.12+ uses its own wlroots fork (based on 0.20) that is included
+in the source tree and linked statically. This external package is provided
+for system integration and to satisfy other packages that may need wlroots-0.20.
 
 
 %package        devel
@@ -81,11 +87,12 @@ Summary:        Development files for %{name}
 Requires:       %{name}%{?_isa} == %{version}-%{release}
 Provides:       wlroots-devel = %{version}-%{release}
 Conflicts:      wlroots-0.19.1-devel
+Conflicts:      wlroots-0.19.2-devel
 # not required per se, so not picked up automatically by RPM
 Recommends:     pkgconfig(xcb-icccm)
 # for examples
 Suggests:       gcc
-Suggests:       meson >= 0.58.0
+Suggests:       meson >= 0.60.0
 Suggests:       pkgconfig(wayland-egl)
 
 %description    devel
@@ -127,6 +134,7 @@ MESON_OPTIONS=(
 
 
 %changelog
-* Mon Oct 28 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.19.2-1
-- Initial pinned package for ScrollWM
-- Pinned to wlroots 0.19.2 for scroll 1.11.8+ compatibility
+* Mon Nov 23 2025 ScrollWM Team <maintainers@scrollwm.org> - 0.20.0-1
+- Initial pinned package for scroll 1.12+
+- Pinned to wlroots 0.20.0 for scroll compatibility
+- Note: Scroll 1.12+ includes its own statically-linked wlroots fork

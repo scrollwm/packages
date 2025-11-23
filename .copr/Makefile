@@ -12,7 +12,7 @@ gccprep: prepare
 
 prebuild:
 	@buildtype="unknown"; \
-	if grep -q "Name:.*scenefx\|Name:.*scrollfx\|Name:.*scroll\|Name:.*wayland\|Name:.*wlroots" "$(SPECFILE)"; then \
+	if grep -q "Name:.*scroll\|Name:.*wayland\|Name:.*wlroots" "$(SPECFILE)"; then \
 		buildtype="gcc"; \
 	fi; \
 	case $$buildtype in \
@@ -30,4 +30,3 @@ srpm: prepare prebuild
 		--define "_rpmdir $(BUILDDIR)" \
 		--define "_buildrootdir $(BUILDDIR)/.build" \
 		$(SPECFILE)
-
