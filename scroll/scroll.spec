@@ -202,16 +202,9 @@ install -d -m755 -pv %{buildroot}%{_sysconfdir}/%{name}/config.d
 %config(noreplace) %{_sysconfdir}/%{name}/config.minimal
 
 %changelog
-* Mon Nov 23 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.12-1
+* Fri Nov 21 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.12-1
 - Update to 1.12
-- Now uses own wlroots fork (based on 0.20), statically linked
-- New decorations: rounded corners, title bars, shadows, blur, dimming
-- Improved animation system with smoother scheduling
-- New fullscreen modes
-- Better screencasting support with wlroots 0.20
-- Includes sway 1.12-dev changes
-- Added systemd integration config
-* Fri Nov 21 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.11.8-1
+* Mon Oct 27 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.11.8-1
 - Update to 1.11.8
 * Mon Oct 27 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.11.7-1
 - Backup scroll package in scrollwm repository
