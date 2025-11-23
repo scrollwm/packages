@@ -1,3 +1,5 @@
+UPDATE REQUIRED: no longer working on scrollfx
+
 # ScrollWM Packages - Setup Guide
 
 ## Overview
