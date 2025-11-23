@@ -14,9 +14,6 @@ Source100:      config.minimal
 Source101:      scroll-portals.conf
 Source102:      50-systemd-user.conf
 
-# Patch to remove git version format (like Arch PKGBUILD)
-Patch0:         remove_git_version_format.patch
-
 BuildRequires:  gcc-c++
 BuildRequires:  meson >= 1.3
 BuildRequires:  pkgconfig(cairo)
