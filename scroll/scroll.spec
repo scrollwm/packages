@@ -1,8 +1,8 @@
 
-%global tag     1.12.1
+%global tag     1.12.2
 
 Name:           scroll
-Version:        1.12.1
+Version:        1.12.2
 Release:        1%{?dist}
 Summary:        i3-compatible Wayland compositor with a scrolling layout
 License:        MIT
@@ -199,6 +199,8 @@ install -d -m755 -pv %{buildroot}%{_sysconfdir}/%{name}/config.d
 %config(noreplace) %{_sysconfdir}/%{name}/config.minimal
 
 %changelog
+* Tue Dec 09 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.12.2-1
+- Update to 1.12.2
 * Thu Dec 04 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.12.1-1
 - Update to 1.12.1
 * Fri Nov 21 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.12-1
