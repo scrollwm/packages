@@ -111,6 +111,8 @@ Wayland server library
 %{_libdir}/libwayland-server.so.0*
 
 %changelog
+* Fri Feb 20 2026 ScrollWM Team <maintainers@scrollwm.org> - 1.24.0-1
+- Update to 1.24.0
 * Tue Oct 28 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.24.0-1
 - Update to 1.24.0
 * Mon Oct 28 2025 ScrollWM Team <maintainers@scrollwm.org> - 1.23.1-1
